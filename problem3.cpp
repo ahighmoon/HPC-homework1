@@ -27,17 +27,18 @@ double* mvmulti(double** mat, double* vec, int sz){
 	return ret;
 }
 
-double* vvadd(double* v1, double* v2, int sz){
+double* vvadd(double* v1, double* v2, int sz, int sign){
 	double* ret = (double*)malloc(sz * sizeof(double));
 	for (int i = 0; i < sz; i ++){
-		ret[i] = v1[i] + v2[i];
+		ret[i] = v1[i] + v2[i] * sign;
 	}
 	return ret;
 }
 
 int main(int argc, char** argv){
 	//Timer t;
-	long N = read_option<long>("-n", argc, argv);
+	//long N = read_option<long>("-n", argc, argv);
+	long N = 10;
 	double h = 1.0/ (N+1);
 	long iter = 5000;
 	double* f = (double*)malloc(N * sizeof(double));
@@ -46,10 +47,14 @@ int main(int argc, char** argv){
 		f[i] = 1;
 		u[i] = 0;
 	}
-	double** a = (double**)malloc(N * N * sizeof(double));
-	memset(a, 0, N * N);
-	double d1 = -(N+1)^2;
-	double d2 = 2 * (N+1)^2;
+
+	double** a = (double**)malloc(N * sizeof(double*));
+	for (int i = 0; i < N; i ++){
+		a[i] = (double *)malloc(N * sizeof(double));
+		memset(a[i], 0, N);
+	}
+	double d1 = -1 * pow(N+1,2);
+	double d2 =  2 * pow(N+1, 2);
 	for (int i = 1; i < N-1; i++){
 		a[i][i-1] = d1;
 		a[i][i]   = d2;
@@ -60,13 +65,13 @@ int main(int argc, char** argv){
 	a[N-1][N-2] = d1;
 	a[N-1][N-1] = d2;
 	double* temp1 = mvmulti(a, u, N);
-	double* temp2 = vvadd(temp1, f, N);
+	double* temp2 = vvadd(temp1, f, N, -1);
 	free(temp1);
 	double target = norm(temp2, N) / 1e4;
 	free(temp2);
-	//for (int it = 0; it < iter; it++){
+
 	int cur = 0;
-	double curnorm = 0;
+	double cunorm = 0;
 	do{
 		for (int i = 0; i < N; i++){
 			double tmp = 0.0;
@@ -77,10 +82,17 @@ int main(int argc, char** argv){
 			u[i] = (f[i] - tmp) / a[i][i];
 		}
 		cur++;
-		curnorm = norm(u, N);
-		cout << "iter = " << cur+1 << ", norm of the residual = " << curnorm << endl;
-	} while (curnorm > target && cur < iter);
-
+		double *temp1 = mvmulti(a, u, N);
+		double *temp2 = vvadd(temp1, f, N, -1);
+		cunorm = norm(temp2, N);
+		free(temp1);
+		free(temp2);
+		cout << "iter = " << cur << ", norm of the residual = " << curnorm << endl;
+	} while (cunorm > target && cur < iter);
+	while (*a){
+		free(*a);
+		a++;
+	}
 	free(a);
 	free(f);
 	free(u);
