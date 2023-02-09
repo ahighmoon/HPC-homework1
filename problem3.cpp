@@ -87,13 +87,14 @@ int main(int argc, char** argv){
 		cunorm = norm(temp2, N);
 		free(temp1);
 		free(temp2);
-		cout << "iter = " << cur << ", norm of the residual = " << curnorm << endl;
+		cout << "iter = " << cur << ", norm of the residual = " << cunorm << endl;
 	} while (cunorm > target && cur < iter);
+	double** tmp = a;
 	while (*a){
 		free(*a);
 		a++;
 	}
-	free(a);
+	free(tmp);
 	free(f);
 	free(u);
 
