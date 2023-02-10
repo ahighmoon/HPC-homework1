@@ -37,12 +37,13 @@ double* vvadd(double* v1, double* v2, int sz, int sign){
 
 int main(int argc, char** argv){
 	//Timer t;
-	//long N = read_option<long>("-n", argc, argv);
-	long N = 10;
-	double h = 1.0/ (N+1);
+	long N = read_option<long>("-n", argc, argv);
+	//long N = 10;
+	//double h = 1.0/ (N+1);
 	long iter = 5000;
 	double* f = (double*)malloc(N * sizeof(double));
-	double* u = (double*)malloc(N * sizeof(double));
+	double* u = (double *)malloc(N * sizeof(double));
+
 	for (int i = 0; i < N; i++) {
 		f[i] = 1;
 		u[i] = 0;
@@ -69,9 +70,12 @@ int main(int argc, char** argv){
 	free(temp1);
 	double target = norm(temp2, N) / 1e4;
 	free(temp2);
-
 	int cur = 0;
 	double cunorm = 0;
+
+	cout << "================================================" << endl;
+	cout << "Now using method 1: Jacobi's method." << endl;
+	cout << "Iternation\t|Residual norm" << endl;
 	do{
 		for (int i = 0; i < N; i++){
 			double tmp = 0.0;
@@ -84,18 +88,56 @@ int main(int argc, char** argv){
 		cur++;
 		double *temp1 = mvmulti(a, u, N);
 		double *temp2 = vvadd(temp1, f, N, -1);
+
 		cunorm = norm(temp2, N);
 		free(temp1);
 		free(temp2);
-		cout << "iter = " << cur << ", norm of the residual = " << cunorm << endl;
+		cout << cur << "\t\t|\t" << cunorm << endl;
 	} while (cunorm > target && cur < iter);
-	double** tmp = a;
-	while (*a){
-		free(*a);
-		a++;
+
+	cunorm = 0;
+	cout << "================================================" << endl;
+	cout << "Now using method 2: Gauss-Seidel algo." << endl;
+	cout << "Iternation\t|Residual norm" << endl;
+	double *u1 = (double *)malloc(N * sizeof(double));
+	double *u2 = (double *)malloc(N * sizeof(double));
+	for (int i = 0; i < N; i++){
+		u1[i] = 0;
+		u2[i] = 0;
 	}
-	free(tmp);
+	cur = 0;
+	double *x;
+	double *y;
+	do{
+		x = (cur % 2 == 0) ? u1 : u2;
+		y = (cur % 2 == 0) ? u2 : u1;
+
+		for (int i = 0; i < N; i++){
+			double tmp = f[i];
+			for (int j = 0; j < i; j++){
+				tmp -= a[i][j] * x[j];
+			}
+			for (int j = i + 1; j < N; j++){
+				tmp -= a[i][j] * y[j];
+			}
+			tmp /= a[i][i];
+			x[i] = tmp;
+		}
+		cur++;
+		double *temp1 = mvmulti(a, x, N);
+		double *temp2 = vvadd(temp1, f, N, -1);
+		cunorm = norm(temp2, N);
+		free(temp1);
+		free(temp2);
+		cout << cur << "\t\t|\t" << cunorm << endl;
+	} while (cunorm > target && cur < iter);
+
+	for (int i = 0; i < N; i++){
+		free(a[i]);
+	}
+	free(a);
 	free(f);
 	free(u);
-
+	free(u1);
+	free(u2);
 }
