@@ -37,22 +37,24 @@ double* vvadd(double* v1, double* v2, int sz, int sign){
 
 int main(int argc, char** argv){
 	//Timer t;
-	long N = read_option<long>("-n", argc, argv);
-	//long N = 10;
+	//long N = read_option<long>("-n", argc, argv);
+	long N = 10;
 	//double h = 1.0/ (N+1);
 	long iter = 5000;
 	double* f = (double*)malloc(N * sizeof(double));
-	double* u = (double *)malloc(N * sizeof(double));
+	double *u1 = (double *)malloc(N * sizeof(double));
+	double *u2 = (double *)malloc(N * sizeof(double));
 
 	for (int i = 0; i < N; i++) {
 		f[i] = 1;
-		u[i] = 0;
+		u1[i] = 0;
+		u2[i] = 0;
 	}
 
 	double** a = (double**)malloc(N * sizeof(double*));
 	for (int i = 0; i < N; i ++){
 		a[i] = (double *)malloc(N * sizeof(double));
-		memset(a[i], 0, N);
+		for (int j = 0; j < N; j++) a[i][j] = 0;
 	}
 	double d1 = -1 * pow(N+1,2);
 	double d2 =  2 * pow(N+1, 2);
@@ -65,7 +67,7 @@ int main(int argc, char** argv){
 	a[0][1] = d1;
 	a[N-1][N-2] = d1;
 	a[N-1][N-1] = d2;
-	double* temp1 = mvmulti(a, u, N);
+	double* temp1 = mvmulti(a, u2, N);
 	double* temp2 = vvadd(temp1, f, N, -1);
 	free(temp1);
 	double target = norm(temp2, N) / 1e4;
@@ -77,16 +79,17 @@ int main(int argc, char** argv){
 	cout << "Now using method 1: Jacobi's method." << endl;
 	cout << "Iternation\t|Residual norm" << endl;
 	do{
-		for (int i = 0; i < N; i++){
+		for (int i = 0; i < N; i++) u1[i] = u2[i];
+		for (int i = 0; i < N; i++) {
 			double tmp = 0.0;
 			for (int j = 0; j < N; j++){
 				if (j == i) continue;
-				tmp+= a[i][j] * u[j];
+				tmp+= a[i][j] * u1[j];
 			}
-			u[i] = (f[i] - tmp) / a[i][i];
+			u2[i] = (f[i] - tmp) / a[i][i];
 		}
 		cur++;
-		double *temp1 = mvmulti(a, u, N);
+		double *temp1 = mvmulti(a, u2, N);
 		double *temp2 = vvadd(temp1, f, N, -1);
 
 		cunorm = norm(temp2, N);
@@ -99,11 +102,9 @@ int main(int argc, char** argv){
 	cout << "================================================" << endl;
 	cout << "Now using method 2: Gauss-Seidel algo." << endl;
 	cout << "Iternation\t|Residual norm" << endl;
-	double *u1 = (double *)malloc(N * sizeof(double));
-	double *u2 = (double *)malloc(N * sizeof(double));
+
 	for (int i = 0; i < N; i++){
-		u1[i] = 0;
-		u2[i] = 0;
+		u1[i] = 0; u2[i] = 0;
 	}
 	cur = 0;
 	double *x;
@@ -137,7 +138,7 @@ int main(int argc, char** argv){
 	}
 	free(a);
 	free(f);
-	free(u);
+	//free(u);
 	free(u1);
 	free(u2);
 }
