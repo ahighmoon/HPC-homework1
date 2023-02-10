@@ -25,23 +25,22 @@ double* mvmulti(double** mat, double* vec, int sz){
 	return ret;
 }
 
-double* vvadd(double* v1, double* v2, int sz, int sign){
+double* vvadd(double* v1, double v2, int sz, int sign){
 	double* ret = (double*)malloc(sz * sizeof(double));
-	for (int i = 0; i < sz; i ++) ret[i] = v1[i] + v2[i] * sign;
+	for (int i = 0; i < sz; i ++) ret[i] = v1[i] + v2 * sign;
 	return ret;
 }
 
 int main(int argc, char** argv){
 	Timer t;
-	//long N = read_option<long>("-n", argc, argv);
-	long N = 100;
+	long N = read_option<long>("-n", argc, argv);
+	//long N = 100;
 	long iter = 5000;
-	double* f = (double*)malloc(N * sizeof(double));
+	double f = 1.0;
 	double *u1 = (double *)malloc(N * sizeof(double));
 	double *u2 = (double *)malloc(N * sizeof(double));
 
 	for (int i = 0; i < N; i++) {
-		f[i] = 1;
 		u1[i] = 0;
 		u2[i] = 0;
 	}
@@ -83,7 +82,7 @@ int main(int argc, char** argv){
 				if (j == i) continue;
 				tmp+= a[i][j] * u1[j];
 			}
-			u2[i] = (f[i] - tmp) / a[i][i];
+			u2[i] = (f - tmp) / a[i][i];
 		}
 		cur++;
 		double *temp1 = mvmulti(a, u2, N);
@@ -114,7 +113,7 @@ int main(int argc, char** argv){
 		x = (cur % 2 == 0) ? u1 : u2;
 		y = (cur % 2 == 0) ? u2 : u1;
 		for (int i = 0; i < N; i++){
-			double tmp = f[i];
+			double tmp = f;
 			for (int j = 0; j < i; j++) tmp -= a[i][j] * x[j];
 			for (int j = i + 1; j < N; j++) tmp -= a[i][j] * y[j];
 			tmp /= a[i][i];
@@ -133,7 +132,7 @@ int main(int argc, char** argv){
 
 	for (int i = 0; i < N; i++) free(a[i]);
 	free(a);
-	free(f);
+	//free(f);
 	free(u1);
 	free(u2);
 }
