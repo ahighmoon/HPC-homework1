@@ -91,8 +91,9 @@ int main(int argc, char** argv){
 		cunorm = norm(temp2, N);
 		free(temp1);
 		free(temp2);
-		cout << cur << "\t\t|\t" << cunorm << endl;
+		//cout << cur << "\t\t|\t" << cunorm << endl;
 	} while (cunorm > target && cur < iter);
+	cout << cur << "\t\t|\t" << cunorm << endl;
 	time = t.toc();
 	cout << "Time spent =" << time << "s.\n" << endl;
 
@@ -125,9 +126,10 @@ int main(int argc, char** argv){
 		cunorm = norm(temp2, N);
 		free(temp1);
 		free(temp2);
-		cout << cur << "\t\t|\t" << cunorm << endl;
+		//cout << cur << "\t\t|\t" << cunorm << endl;
 	} while (cunorm > target && cur < iter);
 	time = t.toc();
+	cout << cur << "\t\t|\t" << cunorm << endl;
 	cout << "Time spent =" << time << "s.\n" << endl;
 
 	for (int i = 0; i < N; i++) free(a[i]);
