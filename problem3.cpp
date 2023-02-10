@@ -19,9 +19,7 @@ double* mvmulti(double** mat, double* vec, int sz){
 	double* ret = (double*)malloc(sz * sizeof(double));
 	for (int i = 0; i < sz; i ++){
 		double sum = 0;
-		for (int j = 0; j < sz; j++){
-			sum += mat[i][j] * vec[j];
-		}
+		for (int j = 0; j < sz; j++) sum += mat[i][j] * vec[j];
 		ret[i] = sum;
 	}
 	return ret;
@@ -29,17 +27,14 @@ double* mvmulti(double** mat, double* vec, int sz){
 
 double* vvadd(double* v1, double* v2, int sz, int sign){
 	double* ret = (double*)malloc(sz * sizeof(double));
-	for (int i = 0; i < sz; i ++){
-		ret[i] = v1[i] + v2[i] * sign;
-	}
+	for (int i = 0; i < sz; i ++) ret[i] = v1[i] + v2[i] * sign;
 	return ret;
 }
 
 int main(int argc, char** argv){
-	//Timer t;
+	Timer t;
 	//long N = read_option<long>("-n", argc, argv);
-	long N = 10;
-	//double h = 1.0/ (N+1);
+	long N = 100;
 	long iter = 5000;
 	double* f = (double*)malloc(N * sizeof(double));
 	double *u1 = (double *)malloc(N * sizeof(double));
@@ -74,10 +69,12 @@ int main(int argc, char** argv){
 	free(temp2);
 	int cur = 0;
 	double cunorm = 0;
+	double time = 0.0;
 
 	cout << "================================================" << endl;
 	cout << "Now using method 1: Jacobi's method." << endl;
 	cout << "Iternation\t|Residual norm" << endl;
+	t.tic();
 	do{
 		for (int i = 0; i < N; i++) u1[i] = u2[i];
 		for (int i = 0; i < N; i++) {
@@ -97,6 +94,8 @@ int main(int argc, char** argv){
 		free(temp2);
 		cout << cur << "\t\t|\t" << cunorm << endl;
 	} while (cunorm > target && cur < iter);
+	time = t.toc();
+	cout << "Time spent =" << time << "s.\n" << endl;
 
 	cunorm = 0;
 	cout << "================================================" << endl;
@@ -104,23 +103,20 @@ int main(int argc, char** argv){
 	cout << "Iternation\t|Residual norm" << endl;
 
 	for (int i = 0; i < N; i++){
-		u1[i] = 0; u2[i] = 0;
+		u1[i] = 0;
+		u2[i] = 0;
 	}
 	cur = 0;
 	double *x;
 	double *y;
+	t.tic();
 	do{
 		x = (cur % 2 == 0) ? u1 : u2;
 		y = (cur % 2 == 0) ? u2 : u1;
-
 		for (int i = 0; i < N; i++){
 			double tmp = f[i];
-			for (int j = 0; j < i; j++){
-				tmp -= a[i][j] * x[j];
-			}
-			for (int j = i + 1; j < N; j++){
-				tmp -= a[i][j] * y[j];
-			}
+			for (int j = 0; j < i; j++) tmp -= a[i][j] * x[j];
+			for (int j = i + 1; j < N; j++) tmp -= a[i][j] * y[j];
 			tmp /= a[i][i];
 			x[i] = tmp;
 		}
@@ -132,13 +128,12 @@ int main(int argc, char** argv){
 		free(temp2);
 		cout << cur << "\t\t|\t" << cunorm << endl;
 	} while (cunorm > target && cur < iter);
+	time = t.toc();
+	cout << "Time spent =" << time << "s.\n" << endl;
 
-	for (int i = 0; i < N; i++){
-		free(a[i]);
-	}
+	for (int i = 0; i < N; i++) free(a[i]);
 	free(a);
 	free(f);
-	//free(u);
 	free(u1);
 	free(u2);
 }
