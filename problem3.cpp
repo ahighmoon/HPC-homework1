@@ -33,9 +33,9 @@ double* vvadd(double* v1, double v2, int sz, int sign){
 
 int main(int argc, char** argv){
 	Timer t;
-	//long N = read_option<long>("-n", argc, argv);
-	long N = 100000;
-	long iter = 100; // 5000;
+	long N = read_option<long>("-n", argc, argv);
+	//long N = 100000;
+	long iter = 100; //5000;
 	double f = 1.0;
 	double *u1 = (double *)malloc(N * sizeof(double));
 	double *u2 = (double *)malloc(N * sizeof(double));

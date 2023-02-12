@@ -1,0 +1,12 @@
+Input size = 1000, initial residual = 31.6228, target = 0.00316228
+================================================
+Now using method 1: Jacobi's method.
+Iteration	|Residual norm
+1848917		|	0.00316227
+Time spent = 5.36547s.
+================================================
+Now using method 2: Gauss-Seidel algo.
+Iteration	|Residual norm
+924460		|	0.00316225
+Time spent = 9.19932s.
+
